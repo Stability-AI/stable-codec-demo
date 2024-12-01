@@ -1,0 +1,1626 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Hugo 0.66.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- 引入Bootstrap CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="shortcut icon" href="favicon.png" type="image/x-icon" />
+
+  <!-- 引入jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <!-- 引入Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,600" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css">
+  <link rel="stylesheet" href="../css/normalize.css">
+  <link rel="stylesheet" href="../css/skeleton.css">
+  <link rel="stylesheet" href="../css/custom.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link rel="alternate" href="index.xml" type="application/rss+xml" title="Speech Research">
+  <link rel="shortcut icon" href="favicon.png" type="image/x-icon" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css"
+    integrity="sha256-XoaMnoYC5TH6/+ihMEnospgm0J1PM/nioxbOUdnM8HY=" crossorigin="anonymous">
+  <style>
+    body {
+      font-size: 20px;
+    }
+
+    h1 {
+      font-size: 30px;
+      color: black;
+    }
+
+    thead {
+      border-top: 1px solid #ccc;
+    }
+
+    .table td {
+      border: none;
+    }
+
+    .no-border {
+      border: none;
+    }
+
+    th {
+      font-weight: lighter;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      width: 100%;
+    }
+
+    .divider {
+      border-top: 2px solid #ccc;
+      margin: 20px 0;
+    }
+
+    .audio-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: none;
+    }
+
+    td {
+      text-align: justify;
+      color: black;
+      font-family: georgian;
+    }
+
+    font {
+      text-align: justify;
+      color: black;
+      font-family: georgian;
+    }
+
+    video {
+      width: 100%;
+      height: auto;
+    }
+
+    img {
+      width: 100%;
+      height: auto;
+    }
+
+    @media(min-width:1200px) {
+      .table-container {
+        overflow-x: auto;
+        width: 100%;
+        margin: 0 auto;
+      }
+    }
+
+    @media (max-width: 600px) {
+      body {
+        font-size: 14px;
+      }
+
+      h1 {
+        font-size: 22px;
+      }
+
+      h2 {
+        font-size: 18px;
+      }
+
+      nav ul li {
+        display: block;
+      }
+
+      .video-container {
+        padding-bottom: 75%;
+      }
+
+      video {
+        width: 100%;
+      }
+    }
+  </style>
+  <title>Scaling Transformers for Low-Bitrate High-Quality Speech Coding</title>
+</head>
+
+<body rightmargin="150" leftmargin="150" topmargin="100" bottommargin="100" line-height:160%>
+  <div class="container">
+
+    <header role="banner">
+    </header>
+    <main role="main">
+      <article itemscope itemtype="https://schema.org/BlogPosting">
+        <br></br>
+        <h1 itemprop="headline" align="center">
+          <font style="font-size:40px; color:black;">Scaling Transformers for Low-Bitrate High-Quality Speech Coding</font>
+        </h1>
+        <br></br>
+        <p style="line-height:1" align="center"><b>
+          <font style="color: #000;">
+            Julian D Parker, Anton Smirnov, Jordi Pons, CJ Carr, Zack Zukowski, Zach Evans, Xubo Liu          
+          </font>
+        </b></p>
+       <p style="line-height:0.6" align="center">
+        <font color="061E61">Stability AI</font>
+      </p>
+        <br>
+        <table align=center width=500px>
+        <center>
+                <span class="link-block">
+                  <a href="https://arxiv.org/abs/"
+                     class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon" style="color: black;">
+                        <i class="fa fa-file-text" aria-hidden="true"></i>
+                    </span>
+                    <span style="font-size:22px; color: black; font-family: georgian;"><b>Paper</b></span>
+                  </a>
+                </span>
+          &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;
+          &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;
+                <!-- Code Link. -->
+                <span class="link-block">
+                  <a href="https://github.com/Stability-AI/stable-codec"
+                     class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon" style="color: black;">
+                        <i class="fab fa-github"></i>
+                    </span>
+                    <span style="font-size:22px; color: black; font-family: georgian;"><b>Code</b></span>
+                    </a>
+                </span>
+          </center>			  
+           </tr>
+        </table>
+
+        <br>
+        <section itemprop="entry-text">
+          <table class="table" align="center" style="table-layout: fixed; word-break:break-word">
+            <th>
+              <h2 id="abstract">
+                <center>
+                  <h1>Abstract</h1>
+                </center>
+              </h2>
+              <p style="text-align: justify; color:black;font-family: georgian;">
+                <font>
+                  The tokenization of speech with neural audio codec models is a vital part of modern AI pipelines for
+                  the generation or understanding of speech, alone or in a multimodal context.
+                  Traditionally such tokenization models have concentrated on low parameter-count architectures using
+                  only components with strong inductive biases.
+                  In this work we show that by scaling a transformer architecture with large parameter count to this
+                  problem, and applying a flexible Finite Scalar Quantization (FSQ) based bottleneck, it is possible to
+                  reach state-of-the-art speech quality at extremely low bit-rates of $400$ or $700$ bits-per-second.
+                  The trained models strongly out-perform existing baselines in both objective and subjective tests.
+                </font>
+              </p>
+            </th>
+          </table>
+
+        <table class="table" align="center" style="table-layout: fixed;word-break:break-word">
+            <th style="border: None;">
+                <h2 id="graph">
+                <center>
+                <h1>Model Architecture</h1>
+                </center>
+            </h2>
+            <p style="text-align: justify; color:black;font-family: georgian;">
+                <font>
+                Architecture of the proposed model TAAE (Transformer Audio AutoEncoder). Detail is shown for the encoder block and sub-blocks. The decoder block is configured identically to the encoder block, with the exception of the strided convolution, which is replaced with its transposed equivalent and moved to the end of the $T_m$ blocks.
+                </font>
+            </p>
+            <figure>
+                <p align="center">
+                    <img src="arch.png" style="width: 60%; max-width: 800px;" class="center" />
+                </p>
+                <figcaption>
+                <p style="text-align: justify;">
+                    <center>
+                    <font color="061E61"><b>Figure:</b> Framework of proposed TAAE.
+                    </center>
+                </p>
+                </figcaption>
+            </figure>
+            </th>
+        </table>
+
+        <table class="table" align="center" style="table-layout: fixed;word-break:break-word">
+          <th>
+              <h2 id="graph">
+              <center>
+              <h1>Performance Comparison</h1>
+              </center>
+          </h2>
+          <p style="text-align: justify; color:black;font-family: georgian;">
+              <font>
+                The results of the MUSHRA subjective test indicate that TAAE obtains state-of-the-art results that outperform, by a significant margin, recently published speech codecs. Importantly, the proposed model obtains results close to the ground truth. Comparing these evaluation results indicates the potential of scaling transformer-based codec architectures to achieve new benchmarks in terms of speech quality and compression.              </font>
+          </p>
+          <figure>
+              <p align="center">
+                  <img src="mushra.png" style="width: 60%; max-width: 800px;" class="center" />
+              </p>
+              <figcaption>
+              <p style="text-align: justify;">
+                  <center>
+                  <font color="061E61"><b>Figure:</b> Comparison with state-of-the-art neural audio codecs.
+                  </center>
+              </p>
+              </figcaption>
+          </figure>
+          </th>
+      </table>
+
+      <br><br>
+
+          <h2 id="section_1">
+            <h3 style="color: black;">Speech Samples (16 kHz)</h3>
+          </h2>
+
+          <div class="table-container">
+            <table class="table" style="word-break: break-word; width: 100%;">
+              <thead>
+                <tr>
+                  <th scope="col">
+                    <center>
+                      <font color="061E61">Ground Truth</font>
+                    </center>
+                  </th>
+                  <th scope="col">
+                    <center>
+                      <font color="061E61">TAAE@0.4kbps</font>
+                    </center>
+                  </th>
+                  <th scope="col">
+                    <center>
+                      <font color="061E61">TAAE@0.7kbps</font>
+                    </center>
+                  </th>
+                  <th scope="col">
+                    <center>
+                      <font color="061E61">Mimi@0.55kbps</font>
+                    </center>
+                  </th>
+                  <th scope="col">
+                    <center>
+                      <font color="061E61">Mimi@1.1kbps</font>
+                    </center>
+                  </th>
+                  <th scope="col">
+                    <center>
+                      <font color="061E61">SemantiCodec@0.34kbps</font>
+                    </center>
+                  </th>
+                  <th scope="col">
+                    <center>
+                      <font color="061E61">SemantiCodec@0.68kbps</font>
+                    </center>
+                  </th>
+                  <th scope="col">
+                    <center>
+                      <font color="061E61">Hubert-HiFi-GAN@0.49kbps</font>
+                    </center>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- 示例2 -->
+                <tr>
+                  <!-- 图片行 -->
+                  <td>
+                    <img alt="260-123286-0018" src="figs/groundtruth_speech/260-123286-0018.png" />
+                  </td>
+                  <td>
+                    <img alt="260-123286-0018" src="figs/tae_lowkbps_speech/260-123286-0018.png" />
+                  </td>
+                  <td>
+                    <img alt="260-123286-0018" src="figs/tae_highkbps_speech/260-123286-0018.png" />
+                  </td>
+                  <td>
+                    <img alt="260-123286-0018" src="figs/mimi_4_speech/260-123286-0018.png" />
+                  </td>
+                  <td>
+                    <img alt="260-123286-0018" src="figs/mimi_8_speech/260-123286-0018.png" />
+                  </td>
+                  <td>
+                    <img alt="260-123286-0018" src="figs/semantiCodec_25_speech/260-123286-0018.png" />
+                  </td>
+                  <td>
+                    <img alt="260-123286-0018" src="figs/semantiCodec_50_speech/260-123286-0018.png" />
+                  </td>
+                  <td>
+                    <img alt="260-123286-0018" src="figs/hubert_hifigan_speech/260-123286-0018.png" />
+                  </td>
+                </tr>
+                <tr>
+                  <!-- 音频行 -->
+                  <td>
+                    <audio controls>
+                      <source src="audios/groundtruth_speech/260-123286-0018.wav" type="audio/wav" />
+                      Your browser does not support the audio element.
+                    </audio>
+                  </td>
+                  <td>
+                    <audio controls>
+                      <source src="audios/tae_lowkbps_speech/260-123286-0018.wav" type="audio/wav" />
+                      Your browser does not support the audio element.
+                    </audio>
+                  </td>
+                  <td>
+                    <audio controls>
+                      <source src="audios/tae_highkbps_speech/260-123286-0018.wav" type="audio/wav" />
+                      Your browser does not support the audio element.
+                    </audio>
+                  </td>
+                  <td>
+                    <audio controls>
+                      <source src="audios/mimi_4_speech/260-123286-0018.wav" type="audio/wav" />
+                      Your browser does not support the audio element.
+                    </audio>
+                  </td>
+                  <td>
+                    <audio controls>
+                      <source src="audios/mimi_8_speech/260-123286-0018.wav" type="audio/wav" />
+                      Your browser does not support the audio element.
+                    </audio>
+                  </td>
+                  <td>
+                    <audio controls>
+                      <source src="audios/semantiCodec_25_speech/260-123286-0018.wav" type="audio/wav" />
+                      Your browser does not support the audio element.
+                    </audio>
+                  </td>
+                  <td>
+                    <audio controls>
+                      <source src="audios/semantiCodec_50_speech/260-123286-0018.wav" type="audio/wav" />
+                      Your browser does not support the audio element.
+                    </audio>
+                  </td>
+                  <td>
+                    <audio controls>
+                      <source src="audios/hubert_hifigan_speech/260-123286-0018.flac" type="audio/wav" />
+                      Your browser does not support the audio element.
+                    </audio>
+                  </td>
+                </tr>
+              </tbody>
+
+                <!-- 示例3 -->
+                <tr>
+                    <!-- 图片行 -->
+                    <td>
+                    <img alt="1320-122612-0008" src="figs/groundtruth_speech/1320-122612-0008.png" />
+                    </td>
+                    <td>
+                    <img alt="1320-122612-0008" src="figs/tae_lowkbps_speech/1320-122612-0008.png" />
+                    </td>
+                    <td>
+                    <img alt="1320-122612-0008" src="figs/tae_highkbps_speech/1320-122612-0008.png" />
+                    </td>
+                    <td>
+                    <img alt="1320-122612-0008" src="figs/mimi_4_speech/1320-122612-0008.png" />
+                    </td>
+                    <td>
+                    <img alt="1320-122612-0008" src="figs/mimi_8_speech/1320-122612-0008.png" />
+                    </td>
+                    <td>
+                    <img alt="1320-122612-0008" src="figs/semantiCodec_25_speech/1320-122612-0008.png" />
+                    </td>
+                    <td>
+                    <img alt="1320-122612-0008" src="figs/semantiCodec_50_speech/1320-122612-0008.png" />
+                    </td>
+                    <td>
+                    <img alt="1320-122612-0008" src="figs/hubert_hifigan_speech/1320-122612-0008.png" />
+                    </td>
+
+                </tr>
+                <tr>
+                    <!-- 音频行 -->
+                    <td>
+                    <audio controls>
+                        <source src="audios/groundtruth_speech/1320-122612-0008.wav" type="audio/wav" />
+                        Your browser does not support the audio element.
+                    </audio>
+                    </td>
+                    <td>
+                    <audio controls>
+                        <source src="audios/tae_lowkbps_speech/1320-122612-0008.wav" type="audio/wav" />
+                        Your browser does not support the audio element.
+                    </audio>
+                    </td>
+                    <td>
+                    <audio controls>
+                        <source src="audios/tae_highkbps_speech/1320-122612-0008.wav" type="audio/wav" />
+                        Your browser does not support the audio element.
+                    </audio>
+                    </td>
+                    <td>
+                    <audio controls>
+                        <source src="audios/mimi_4_speech/1320-122612-0008.wav" type="audio/wav" />
+                        Your browser does not support the audio element.
+                    </audio>
+                    </td>
+                    <td>
+                    <audio controls>
+                        <source src="audios/mimi_8_speech/1320-122612-0008.wav" type="audio/wav" />
+                        Your browser does not support the audio element.
+                    </audio>
+                    </td>
+                    <td>
+                    <audio controls>
+                        <source src="audios/semantiCodec_25_speech/1320-122612-0008.wav" type="audio/wav" />
+                        Your browser does not support the audio element.
+                    </audio>
+                    </td>
+                    <td>
+                    <audio controls>
+                        <source src="audios/semantiCodec_50_speech/1320-122612-0008.wav" type="audio/wav" />
+                        Your browser does not support the audio element.
+                    </audio>
+                    </td>
+                    <td>
+                    <audio controls>
+                        <source src="audios/hubert_hifigan_speech/1320-122612-0008.flac" type="audio/wav" />
+                        Your browser does not support the audio element.
+                    </audio>
+                    </td>
+
+                </tr>
+                </tbody>
+
+                <!-- 示例4 -->
+                <tr>
+                    <!-- 图片行 -->
+                    <td>
+                    <img alt="1995-1837-0024" src="figs/groundtruth_speech/1995-1837-0024.png" />
+                    </td>
+                    <td>
+                    <img alt="1995-1837-0024" src="figs/tae_lowkbps_speech/1995-1837-0024.png" />
+                    </td>
+                    <td>
+                    <img alt="1995-1837-0024" src="figs/tae_highkbps_speech/1995-1837-0024.png" />
+                    </td>
+                    <td>
+                    <img alt="1995-1837-0024" src="figs/mimi_4_speech/1995-1837-0024.png" />
+                    </td>
+                    <td>
+                    <img alt="1995-1837-0024" src="figs/mimi_8_speech/1995-1837-0024.png" />
+                    </td>
+                    <td>
+                    <img alt="1995-1837-0024" src="figs/semantiCodec_25_speech/1995-1837-0024.png" />
+                    </td>
+                    <td>
+                    <img alt="1995-1837-0024" src="figs/semantiCodec_50_speech/1995-1837-0024.png" />
+                    </td>
+                    <td>
+                    <img alt="1995-1837-0024" src="figs/hubert_hifigan_speech/1995-1837-0024.png" />
+                    </td>
+                </tr>
+                <tr>
+                    <!-- 音频行 -->
+                    <td>
+                    <audio controls>
+                        <source src="audios/groundtruth_speech/1995-1837-0024.wav" type="audio/wav" />
+                        Your browser does not support the audio element.
+                    </audio>
+                    </td>
+                    <td>
+                    <audio controls>
+                    <source src="audios/tae_lowkbps_speech/1995-1837-0024.wav" type="audio/wav" />
+                    Your browser does not support the audio element.
+                    </audio>
+                    </td>
+                    <td>
+                    <audio controls>
+                        <source src="audios/tae_highkbps_speech/1995-1837-0024.wav" type="audio/wav" />
+                        Your browser does not support the audio element.
+                    </audio>
+                    </td>
+                    <td>
+                    <audio controls>
+                        <source src="audios/mimi_4_speech/1995-1837-0024.wav" type="audio/wav" />
+                        Your browser does not support the audio element.
+                    </audio>
+                    </td>
+                    <td>
+                    <audio controls>
+                        <source src="audios/mimi_8_speech/1995-1837-0024.wav" type="audio/wav" />
+                        Your browser does not support the audio element.
+                    </audio>
+                    </td>
+                    <td>
+                    <audio controls>
+                        <source src="audios/semantiCodec_25_speech/1995-1837-0024.wav" type="audio/wav" />
+                        Your browser does not support the audio element.
+                    </audio>
+                    </td>
+                    <td>
+                    <audio controls>
+                        <source src="audios/semantiCodec_50_speech/1995-1837-0024.wav" type="audio/wav" />
+                        Your browser does not support the audio element.
+                    </audio>
+                    </td>
+                    <td>
+                    <audio controls>
+                        <source src="audios/hubert_hifigan_speech/1995-1837-0024.flac" type="audio/wav" />
+                        Your browser does not support the audio element.
+                    </audio>
+                    </td>
+                </tr>
+                </tbody>
+
+                <!-- 示例5 -->
+                <tr>
+                    <!-- 图片行 -->
+                    <td>
+                    <img alt="4077-13754-0003" src="figs/groundtruth_speech/4077-13754-0003.png" />
+                    </td>
+                    <td>
+                    <img alt="4077-13754-0003" src="figs/tae_lowkbps_speech/4077-13754-0003.png" />
+                    </td>
+                    <td>
+                    <img alt="4077-13754-0003" src="figs/tae_highkbps_speech/4077-13754-0003.png" />
+                    </td>
+                    <td>
+                    <img alt="4077-13754-0003" src="figs/mimi_4_speech/4077-13754-0003.png" />
+                    </td>
+                    <td>
+                    <img alt="4077-13754-0003" src="figs/mimi_8_speech/4077-13754-0003.png" />
+                    </td>
+                    <td>
+                    <img alt="4077-13754-0003" src="figs/semantiCodec_25_speech/4077-13754-0003.png" />
+                    </td>
+                    <td>
+                    <img alt="4077-13754-0003" src="figs/semantiCodec_50_speech/4077-13754-0003.png" />
+                    </td>
+                    <td>
+                    <img alt="4077-13754-0003" src="figs/hubert_hifigan_speech/4077-13754-0003.png" />
+                    </td>
+
+                </tr>
+                <tr>
+                    <!-- 音频行 -->
+                    <td>
+                    <audio controls>
+                        <source src="audios/groundtruth_speech/4077-13754-0003.wav" type="audio/wav" />
+                        Your browser does not support the audio element.
+                    </audio>
+                    </td>
+                    <td>
+                    <audio controls>
+                        <source src="audios/tae_lowkbps_speech/4077-13754-0003.wav" type="audio/wav" />
+                        Your browser does not support the audio element.
+                    </audio>
+                    </td>
+                    <td>
+                    <audio controls>
+                        <source src="audios/tae_highkbps_speech/4077-13754-0003.wav" type="audio/wav" />
+                        Your browser does not support the audio element.
+                    </audio>
+                    </td>
+                    <td>
+                    <audio controls>
+                        <source src="audios/mimi_4_speech/4077-13754-0003.wav" type="audio/wav" />
+                        Your browser does not support the audio element.
+                    </audio>
+                    </td>
+                    <td>
+                    <audio controls>
+                        <source src="audios/mimi_8_speech/4077-13754-0003.wav" type="audio/wav" />
+                        Your browser does not support the audio element.
+                    </audio>
+                    </td>
+                    <td>
+                    <audio controls>
+                        <source src="audios/semantiCodec_25_speech/4077-13754-0003.wav" type="audio/wav" />
+                        Your browser does not support the audio element.
+                    </audio>
+                    </td>
+                    <td>
+                    <audio controls>
+                        <source src="audios/semantiCodec_50_speech/4077-13754-0003.wav" type="audio/wav" />
+                        Your browser does not support the audio element.
+                    </audio>
+                    </td>
+                    <td>
+                    <audio controls>
+                        <source src="audios/hubert_hifigan_speech/4077-13754-0003.flac" type="audio/wav" />
+                        Your browser does not support the audio element.
+                    </audio>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <!-- 可折叠部分 -->
+            <div id="accordion">
+              <div class="card">
+                <div class="card-header" id="headingMore">
+                  <h5 class="mb-0">
+                    <button class="btn btn-link" data-toggle="collapse" data-target="#collapseMoreExamples"
+                      aria-expanded="false" aria-controls="collapseMoreExamples">
+                      &#x1F449; Click for more examples.
+                    </button>
+                  </h5>
+                </div>
+                <div id="collapseMoreExamples" class="collapse" aria-labelledby="headingMore"
+                  data-parent="#accordion">
+                  <div class="card-body">
+                    <table class="table" style="word-break: break-word; width: 100%;">
+                      <thead>
+                        <tr>
+                          <th scope="col">
+                            <center>
+                              <font color="061E61">Ground Truth</font>
+                            </center>
+                          </th>
+                          <th scope="col">
+                            <center>
+                              <font color="061E61">TAAE@0.4kbps</font>
+                            </center>
+                          </th>
+                          <th scope="col">
+                            <center>
+                              <font color="061E61">TAAE@0.7kbps</font>
+                            </center>
+                          </th>
+                          <th scope="col">
+                            <center>
+                              <font color="061E61">Mimi@0.55kbps</font>
+                            </center>
+                          </th>
+                          <th scope="col">
+                            <center>
+                              <font color="061E61">Mimi@1.1kbps</font>
+                            </center>
+                          </th>
+                          <th scope="col">
+                            <center>
+                              <font color="061E61">SemantiCodec@0.34kbps</font>
+                            </center>
+                          </th>
+                          <th scope="col">
+                            <center>
+                              <font color="061E61">SemantiCodec@0.68kbps</font>
+                            </center>
+                          </th>
+                          <th scope="col">
+                            <center>
+                              <font color="061E61">Hubert-HiFi-GAN@0.49kbps</font>
+                            </center>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <!-- 示例1 -->
+                        <tr>
+                          <!-- 图片行 -->
+                          <td>
+                            <img alt="4446-2273-0035" src="figs/groundtruth_speech/4446-2273-0035.png" />
+                          </td>
+                          <td>
+                            <img alt="4446-2273-0035" src="figs/tae_lowkbps_speech/4446-2273-0035.png" />
+                          </td>
+                          <td>
+                            <img alt="4446-2273-0035" src="figs/tae_highkbps_speech/4446-2273-0035.png" />
+                          </td>
+                          <td>
+                            <img alt="4446-2273-0035" src="figs/mimi_4_speech/4446-2273-0035.png" />
+                          </td>
+                          <td>
+                            <img alt="4446-2273-0035" src="figs/mimi_8_speech/4446-2273-0035.png" />
+                          </td>
+                          <td>
+                            <img alt="4446-2273-0035" src="figs/semantiCodec_25_speech/4446-2273-0035.png" />
+                          </td>
+                          <td>
+                            <img alt="4446-2273-0035" src="figs/semantiCodec_50_speech/4446-2273-0035.png" />
+                          </td>
+                          <td>
+                            <img alt="4446-2273-0035" src="figs/hubert_hifigan_speech/4446-2273-0035.png" />
+                          </td>
+
+                        </tr>
+                        <tr>
+                          <!-- 音频行 -->
+                          <td>
+                            <audio controls>
+                              <source src="audios/groundtruth_speech/4446-2273-0035.wav" type="audio/wav" />
+                              Your browser does not support the audio element.
+                            </audio>
+                          </td>
+                          <td>
+                            <audio controls>
+                              <source src="audios/tae_lowkbps_speech/4446-2273-0035.wav" type="audio/wav" />
+                              Your browser does not support the audio element.
+                            </audio>
+                          </td>
+                          <td>
+                            <audio controls>
+                              <source src="audios/tae_highkbps_speech/4446-2273-0035.wav" type="audio/wav" />
+                              Your browser does not support the audio element.
+                            </audio>
+                          </td>
+                          <td>
+                            <audio controls>
+                              <source src="audios/mimi_4_speech/4446-2273-0035.wav" type="audio/wav" />
+                              Your browser does not support the audio element.
+                            </audio>
+                          </td>
+                          <td>
+                            <audio controls>
+                              <source src="audios/mimi_8_speech/4446-2273-0035.wav" type="audio/wav" />
+                              Your browser does not support the audio element.
+                            </audio>
+                          </td>
+                          <td>
+                            <audio controls>
+                              <source src="audios/semantiCodec_25_speech/4446-2273-0035.wav" type="audio/wav" />
+                              Your browser does not support the audio element.
+                            </audio>
+                          </td>
+                          <td>
+                            <audio controls>
+                              <source src="audios/semantiCodec_50_speech/4446-2273-0035.wav" type="audio/wav" />
+                              Your browser does not support the audio element.
+                            </audio>
+                          </td>
+                          <td>
+                            <audio controls>
+                              <source src="audios/hubert_hifigan_speech/4446-2273-0035.flac" type="audio/wav" />
+                              Your browser does not support the audio element.
+                            </audio>
+                          </td>
+                        </tr>
+
+
+
+                        <!-- 示例2 -->
+                        <tr>
+                            <!-- 图片行 -->
+                            <td>
+                                <img alt="4970-29093-0019" src="figs/groundtruth_speech/4970-29093-0019.png" />
+                            </td>
+                            <td>
+                                <img alt="4970-29093-0019" src="figs/tae_lowkbps_speech/4970-29093-0019.png" />
+                            </td>
+                            <td>
+                                <img alt="4970-29093-0019" src="figs/tae_highkbps_speech/4970-29093-0019.png" />
+                            </td>
+                            <td>
+                                <img alt="4970-29093-0019" src="figs/mimi_4_speech/4970-29093-0019.png" />
+                            </td>
+                            <td>
+                                <img alt="4970-29093-0019" src="figs/mimi_8_speech/4970-29093-0019.png" />
+                            </td>
+                            <td>
+                                <img alt="4970-29093-0019" src="figs/semantiCodec_25_speech/4970-29093-0019.png" />
+                            </td>
+                            <td>
+                                <img alt="4970-29093-0019" src="figs/semantiCodec_50_speech/4970-29093-0019.png" />
+                            </td>
+                            <td>
+                                <img alt="4970-29093-0019" src="figs/hubert_hifigan_speech/4970-29093-0019.png" />
+                            </td>
+
+                        </tr>
+                        <tr>
+                        <!-- 音频行 -->
+                        <td>
+                            <audio controls>
+                            <source src="audios/groundtruth_speech/4970-29093-0019.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/tae_lowkbps_speech/4970-29093-0019.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/tae_highkbps_speech/4970-29093-0019.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/mimi_4_speech/4970-29093-0019.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/mimi_8_speech/4970-29093-0019.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/semantiCodec_25_speech/4970-29093-0019.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/semantiCodec_50_speech/4970-29093-0019.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/hubert_hifigan_speech/4970-29093-0019.flac" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        </tr>
+
+
+                        <!-- 示例3 -->
+                        <tr>
+                            <!-- 图片行 -->
+                            <td>
+                              <img alt="5683-32865-0013" src="figs/groundtruth_speech/5683-32865-0013.png" />
+                            </td>
+                            <td>
+                                <img alt="5683-32865-0013" src="figs/tae_lowkbps_speech/5683-32865-0013.png" />
+                            </td>
+                            <td>
+                                <img alt="5683-32865-0013" src="figs/tae_highkbps_speech/5683-32865-0013.png" />
+                            </td>
+                            <td>
+                              <img alt="5683-32865-0013" src="figs/mimi_4_speech/5683-32865-0013.png" />
+                            </td>
+                            <td>
+                              <img alt="5683-32865-0013" src="figs/mimi_8_speech/5683-32865-0013.png" />
+                            </td>
+                            <td>
+                              <img alt="5683-32865-0013" src="figs/semantiCodec_25_speech/5683-32865-0013.png" />
+                            </td>
+                            <td>
+                              <img alt="5683-32865-0013" src="figs/semantiCodec_50_speech/5683-32865-0013.png" />
+                            </td>
+                            <td>
+                              <img alt="5683-32865-0013" src="figs/hubert_hifigan_speech/5683-32865-0013.png" />
+                            </td>
+
+                        </tr>
+                        <tr>
+                        <!-- 音频行 -->
+                        <td>
+                            <audio controls>
+                            <source src="audios/groundtruth_speech/5683-32865-0013.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/tae_lowkbps_speech/5683-32865-0013.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/tae_highkbps_speech/5683-32865-0013.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/mimi_4_speech/5683-32865-0013.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/mimi_8_speech/5683-32865-0013.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/semantiCodec_25_speech/5683-32865-0013.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/semantiCodec_50_speech/5683-32865-0013.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/hubert_hifigan_speech/5683-32865-0013.flac" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        </tr>
+
+                        <!-- 示例4 -->
+                        <tr>
+                            <!-- 图片行 -->
+                            <td>
+                              <img alt="7021-79730-0005" src="figs/groundtruth_speech/7021-79730-0005.png" />
+                            </td>
+                            <td>
+                                <img alt="7021-79730-0005" src="figs/tae_lowkbps_speech/7021-79730-0005.png" />
+                            </td>
+                            <td>
+                                <img alt="7021-79730-0005" src="figs/tae_highkbps_speech/7021-79730-0005.png" />
+                            </td>
+                            <td>
+                              <img alt="7021-79730-0005" src="figs/mimi_4_speech/7021-79730-0005.png" />
+                            </td>
+                            <td>
+                              <img alt="7021-79730-0005" src="figs/mimi_8_speech/7021-79730-0005.png" />
+                            </td>
+                            <td>
+                              <img alt="7021-79730-0005" src="figs/semantiCodec_25_speech/7021-79730-0005.png" />
+                            </td>
+                            <td>
+                              <img alt="7021-79730-0005" src="figs/semantiCodec_50_speech/7021-79730-0005.png" />
+                            </td>
+                            <td>
+                              <img alt="7021-79730-0005" src="figs/hubert_hifigan_speech/7021-79730-0005.png" />
+                            </td>
+                        </tr>
+                        <tr>
+                        <!-- 音频行 -->
+                        <td>
+                            <audio controls>
+                            <source src="audios/groundtruth_speech/7021-79730-0005.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/tae_lowkbps_speech/7021-79730-0005.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/tae_highkbps_speech/7021-79730-0005.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/mimi_4_speech/7021-79730-0005.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/mimi_8_speech/7021-79730-0005.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/semantiCodec_25_speech/7021-79730-0005.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/semantiCodec_50_speech/7021-79730-0005.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/hubert_hifigan_speech/7021-79730-0005.flac" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        </tr>
+
+                        <!-- 可继续添加更多示例 -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <br/>
+
+          <h2 id="section_2">
+            <h3 style="color: black;">Multilingual Speech Samples (16 kHz)</h3>
+          </h2>
+
+          <div class="table-container">
+            <table class="table" style="width: 100%;">
+              <thead>
+                <tr>
+                  <th scope="col">
+                    <center>
+                      <font color="061E61">Language</font>
+                    </center>
+                  </th>
+                  <th scope="col">
+                    <center>
+                      <font color="061E61">Ground Truth</font>
+                    </center>
+                  </th>
+                  <th scope="col">
+                    <center>
+                      <font color="061E61">TAAE@0.7kbps</font>
+                    </center>
+                  </th>
+                  <th scope="col">
+                    <center>
+                      <font color="061E61">Mimi@1.1kbps</font>
+                    </center>
+                  </th>
+                  <th scope="col">
+                    <center>
+                      <font color="061E61">SemantiCodec@0.68kbps</font>
+                    </center>
+                  </th>
+                  <th scope="col">
+                    <center>
+                      <font color="061E61">SpeechTokenizer@1.5kbps</font>
+                    </center>
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody>
+                    <tr>
+                        <td>
+                            <center><font>German</font></center>
+                        </td>
+                        <td>
+                          <img alt="3503_3039_000356" src="figs/groundtruth_speech_mls/mls_german/3503_3039_000356.png" />
+                        </td>
+                        <td>
+                            <img alt="3503_3039_000356" src="figs/tae_highkbps_speech_mls/mls_german/3503_3039_000356.png" />
+                        </td>
+                        <td>
+                            <img alt="3503_3039_000356" src="figs/mimi_8_speech_mls/mls_german/3503_3039_000356.png" />
+                        </td>
+                        <td>
+                          <img alt="3503_3039_000356" src="figs/semantiCodec_50_speech_mls/mls_german/3503_3039_000356.png" />
+                        </td>
+                        <td>
+                          <img alt="3503_3039_000356" src="figs/speech_tokenizer_3vq_mls/mls_german/3503_3039_000356.png" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><center><font>&nbsp</font></center></td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/groundtruth_speech_mls/mls_german/3503_3039_000356.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/tae_highkbps_speech_mls/mls_german/3503_3039_000356.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/mimi_8_speech_mls/mls_german/3503_3039_000356.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/semantiCodec_50_speech_mls/mls_german/3503_3039_000356.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/speech_tokenizer_3vq_mls/mls_german/3503_3039_000356.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <center><font>German</font></center>
+                        </td>
+                        <td>
+                          <img alt="136_82_000142" src="figs/groundtruth_speech_mls/mls_german/136_82_000142.png" />
+                        </td>
+                        <td>
+                            <img alt="136_82_000142" src="figs/tae_highkbps_speech_mls/mls_german/136_82_000142.png" />
+                        </td>
+                        <td>
+                            <img alt="136_82_000142" src="figs/mimi_8_speech_mls/mls_german/136_82_000142.png" />
+                        </td>
+                        <td>
+                          <img alt="136_82_000142" src="figs/semantiCodec_50_speech_mls/mls_german/136_82_000142.png" />
+                        </td>
+                        <td>
+                          <img alt="136_82_000142" src="figs/speech_tokenizer_3vq_mls/mls_german/136_82_000142.png" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><center><font>&nbsp</font></center></td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/groundtruth_speech_mls/mls_german/136_82_000142.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/tae_highkbps_speech_mls/mls_german/136_82_000142.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/mimi_8_speech_mls/mls_german/136_82_000142.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/semantiCodec_50_speech_mls/mls_german/136_82_000142.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/speech_tokenizer_3vq_mls/mls_german/136_82_000142.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <center><font>French</font></center>
+                        </td>
+                        <td>
+                          <img alt="123_394_000304" src="figs/groundtruth_speech_mls/mls_french/123_394_000304.png" />
+                        </td>
+                        <td>
+                            <img alt="123_394_000304" src="figs/tae_highkbps_speech_mls/mls_french/123_394_000304.png" />
+                        </td>
+                        <td>
+                            <img alt="123_394_000304" src="figs/mimi_8_speech_mls/mls_french/123_394_000304.png" />
+                        </td>
+                        <td>
+                          <img alt="123_394_000304" src="figs/semantiCodec_50_speech_mls/mls_french/123_394_000304.png" />
+                        </td>
+                        <td>
+                          <img alt="123_394_000304" src="figs/speech_tokenizer_3vq_mls/mls_french/123_394_000304.png" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><center><font>&nbsp</font></center></td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/groundtruth_speech_mls/mls_french/123_394_000304.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/tae_highkbps_speech_mls/mls_french/123_394_000304.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/mimi_8_speech_mls/mls_french/123_394_000304.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/semantiCodec_50_speech_mls/mls_french/123_394_000304.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/speech_tokenizer_3vq_mls/mls_french/123_394_000304.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <center><font>French</font></center>
+                        </td>
+                        <td>
+                          <img alt="9804_10527_000675" src="figs/groundtruth_speech_mls/mls_french/9804_10527_000675.png" />
+                        </td>
+                        <td>
+                            <img alt="9804_10527_000675" src="figs/tae_highkbps_speech_mls/mls_french/9804_10527_000675.png" />
+                        </td>
+                        <td>
+                            <img alt="9804_10527_000675" src="figs/mimi_8_speech_mls/mls_french/9804_10527_000675.png" />
+                        </td>
+                        <td>
+                          <img alt="9804_10527_000675" src="figs/semantiCodec_50_speech_mls/mls_french/9804_10527_000675.png" />
+                        </td>
+                        <td>
+                          <img alt="9804_10527_000675" src="figs/speech_tokenizer_3vq_mls/mls_french/9804_10527_000675.png" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><center><font>&nbsp</font></center></td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/groundtruth_speech_mls/mls_french/9804_10527_000675.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/tae_highkbps_speech_mls/mls_french/9804_10527_000675.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/mimi_8_speech_mls/mls_french/9804_10527_000675.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/semantiCodec_50_speech_mls/mls_french/9804_10527_000675.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/speech_tokenizer_3vq_mls/mls_french/9804_10527_000675.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <center><font>Polish</font></center>
+                        </td>
+                        <td>
+                          <img alt="6439_5541_000240" src="figs/groundtruth_speech_mls/mls_polish/6439_5541_000240.png" />
+                        </td>
+                        <td>
+                            <img alt="6439_5541_000240" src="figs/tae_highkbps_speech_mls/mls_polish/6439_5541_000240.png" />
+                        </td>
+                        <td>
+                            <img alt="6439_5541_000240" src="figs/mimi_8_speech_mls/mls_polish/6439_5541_000240.png" />
+                        </td>
+                        <td>
+                          <img alt="6439_5541_000240" src="figs/semantiCodec_50_speech_mls/mls_polish/6439_5541_000240.png" />
+                        </td>
+                        <td>
+                          <img alt="6439_5541_000240" src="figs/speech_tokenizer_3vq_mls/mls_polish/6439_5541_000240.png" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><center><font>&nbsp</font></center></td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/groundtruth_speech_mls/mls_polish/6439_5541_000240.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/tae_highkbps_speech_mls/mls_polish/6439_5541_000240.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/mimi_8_speech_mls/mls_polish/6439_5541_000240.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/semantiCodec_50_speech_mls/mls_polish/6439_5541_000240.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/speech_tokenizer_3vq_mls/mls_polish/6439_5541_000240.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <center><font>Polish</font></center>
+                        </td>
+                        <td>
+                          <img alt="6892_6779_000015" src="figs/groundtruth_speech_mls/mls_polish/6892_6779_000015.png" />
+                        </td>
+                        <td>
+                            <img alt="6892_6779_000015" src="figs/tae_highkbps_speech_mls/mls_polish/6892_6779_000015.png" />
+                        </td>
+                        <td>
+                            <img alt="6892_6779_000015" src="figs/mimi_8_speech_mls/mls_polish/6892_6779_000015.png" />
+                        </td>
+                        <td>
+                          <img alt="6892_6779_000015" src="figs/semantiCodec_50_speech_mls/mls_polish/6892_6779_000015.png" />
+                        </td>
+                        <td>
+                          <img alt="6892_6779_000015" src="figs/speech_tokenizer_3vq_mls/mls_polish/6892_6779_000015.png" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><center><font>&nbsp</font></center></td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/groundtruth_speech_mls/mls_polish/6892_6779_000015.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/tae_highkbps_speech_mls/mls_polish/6892_6779_000015.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/mimi_8_speech_mls/mls_polish/6892_6779_000015.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/semantiCodec_50_speech_mls/mls_polish/6892_6779_000015.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/speech_tokenizer_3vq_mls/mls_polish/6892_6779_000015.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                    </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <br/>
+          <h2 id="section_3">
+            <h3 style="color: black;">Causal TAAE Samples (16 kHz)</h3>
+          </h2>
+
+          <div class="table-container">
+            <table class="table" style="word-break: break-word; width: 100%;">
+              <thead>
+                <tr>
+                  <th scope="col">
+                    <center>
+                      <font color="061E61">Ground Truth</font>
+                    </center>
+                  </th>
+                  <th scope="col">
+                    <center>
+                      <font color="061E61">TAAE</font>
+                    </center>
+                  </th>
+                  <th scope="col">
+                    <center>
+                      <font color="061E61">Causal TAAE</font>
+                    </center>
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody>
+                    <tr>
+                        <td>
+                          <img alt="908-31957-0024" src="figs/groundtruth_speech/908-31957-0024.png" />
+                        </td>
+                        <td>
+                            <img alt="908-31957-0024" src="figs/tae_highkbps_speech/908-31957-0024.png" />
+                        </td>
+                        <td>
+                            <img alt="908-31957-0024" src="figs/tae_causal_highkbps_speech/908-31957-0024.png" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <audio controls>
+                            <source src="audios/groundtruth_speech/908-31957-0024.flac" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/tae_highkbps_speech/908-31957-0024.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/tae_causal_highkbps_speech/908-31957-0024.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                          <img alt="8463-294828-0031" src="figs/groundtruth_speech/8463-294828-0031.png" />
+                        </td>
+                        <td>
+                            <img alt="8463-294828-0031" src="figs/tae_highkbps_speech/8463-294828-0031.png" />
+                        </td>
+                        <td>
+                            <img alt="8463-294828-0031" src="figs/tae_causal_highkbps_speech/8463-294828-0031.png" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <audio controls>
+                            <source src="audios/groundtruth_speech/8463-294828-0031.flac" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/tae_highkbps_speech/8463-294828-0031.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/tae_causal_highkbps_speech/8463-294828-0031.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                          <img alt="61-70970-0024" src="figs/groundtruth_speech/61-70970-0024.png" />
+                        </td>
+                        <td>
+                            <img alt="61-70970-0024" src="figs/tae_highkbps_speech/61-70970-0024.png" />
+                        </td>
+                        <td>
+                            <img alt="61-70970-0024" src="figs/tae_causal_highkbps_speech/61-70970-0024.png" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <audio controls>
+                            <source src="audios/groundtruth_speech/61-70970-0024.flac" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/tae_highkbps_speech/61-70970-0024.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/tae_causal_highkbps_speech/61-70970-0024.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                          <img alt="2830-3980-0050" src="figs/groundtruth_speech/2830-3980-0050.png" />
+                        </td>
+                        <td>
+                            <img alt="2830-3980-0050" src="figs/tae_highkbps_speech/2830-3980-0050.png" />
+                        </td>
+                        <td>
+                            <img alt="2830-3980-0050" src="figs/tae_causal_highkbps_speech/2830-3980-0050.png" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <audio controls>
+                            <source src="audios/groundtruth_speech/2830-3980-0050.flac" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/tae_highkbps_speech/2830-3980-0050.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                        <td>
+                            <audio controls>
+                            <source src="audios/tae_causal_highkbps_speech/2830-3980-0050.wav" type="audio/wav" />
+                            Your browser does not support the audio element.
+                            </audio>
+                        </td>
+                    </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <hr>
+          <br></br>
+        </section>
+      </article>
+    </main>
+
+  </div>
+
+  <!-- 引入必要的脚本 -->
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad();
+  </script>
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      HTML: ["input/TeX", "output/HTML-CSS"],
+      TeX: {
+        Macros: {
+          bm: ["\\boldsymbol{#1}", 1],
+          argmax: ["\\mathop{\\rm arg\\,max}\\limits"],
+          argmin: ["\\mathop{\\rm arg\\,min}\\limits"]
+        },
+        extensions: ["AMSmath.js", "AMSsymbols.js"],
+        equationNumbers: { autoNumber: "AMS" }
+      },
+      extensions: ["tex2jax.js"],
+      jax: ["input/TeX", "output/HTML-CSS"],
+      tex2jax: {
+        inlineMath: [['$', '$'], ["\\(", "\\)"]],
+        displayMath: [['$$', '$$'], ["\\[", "\\]"]],
+        processEscapes: true
+      },
+      "HTML-CSS": {
+        availableFonts: ["TeX"],
+        linebreaks: { automatic: true }
+      }
+    });
+  </script>
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+  </script>
+
+  <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6Hty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"></script>
+</body>
+
+</html>
